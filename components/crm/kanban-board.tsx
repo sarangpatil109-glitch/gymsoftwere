@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Lead, LeadStage } from "@/types/crm";
 import { useLeads, useUpdateLeadStage } from "@/hooks/useCRM";
 import { 
@@ -38,8 +38,9 @@ export function KanbanBoard() {
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
 
   // Sync leads when data changes, but we manage local state for smooth drag drop
-  useMemo(() => {
+  useEffect(() => {
     setLeads(leadsData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leadsData]);
 
   const columns = useMemo(() => STAGES.map(stage => ({ id: stage, title: stage })), []);
