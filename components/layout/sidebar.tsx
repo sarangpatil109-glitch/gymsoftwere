@@ -32,7 +32,11 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps = {}) {
   const pathname = usePathname();
   const { data: profile } = useGymProfile();
   const gymName = profile?.gymName || "GymOS";
@@ -55,6 +59,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => onNavigate?.()}
                 className={cn(
                   "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
                   isActive
