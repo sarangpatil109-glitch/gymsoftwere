@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
+import { FactoryResetSettings } from "./factory-reset";
 
 export function SystemPreferencesSettings() {
   const { data: prefs, isLoading } = useSystemPreferences();
@@ -128,6 +129,8 @@ export function SystemPreferencesSettings() {
           {updatePrefs.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : "Save Preferences"}
         </Button>
       </div>
+
+      <FactoryResetSettings />
     </div>
   );
 }
