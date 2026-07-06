@@ -15,7 +15,8 @@ import {
   Apple,
   ClipboardList,
   MessageCircleCode,
-  Store
+  Store,
+  Zap
 } from "lucide-react";
 
 const navigation = [
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Diet", href: "/diet", icon: Apple },
   { name: "Trainer Panel", href: "/trainer-panel", icon: ClipboardList },
   { name: "Store & Inventory", href: "/store", icon: Store },
+  { name: "Automation Center", href: "/automations", icon: Zap },
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "WhatsApp Center", href: "/whatsapp", icon: MessageCircleCode },
   { name: "Settings", href: "/settings", icon: Settings },

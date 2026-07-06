@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentService } from "@/services/paymentService";
 import { PaymentFormValues } from "@/validation/paymentSchema";
 import { toast } from "sonner";
+import { dispatchAutomationEvent } from "@/services/automation";
 
 export function usePayments() {
   return useQuery({
@@ -41,6 +42,13 @@ export function useReceivePayment() {
     mutationFn: (data: PaymentFormValues) => paymentService.receivePayment(data),
     onSuccess: (data) => {
       toast.success("Payment received successfully!");
+      if (data && data.memberId) {
+        dispatchAutomationEvent('PAYMENT_RECEIVED', { 
+          memberId: data.memberId,
+          paymentId: data.id,
+          receiptLink: typeof window !== 'undefined' ? `${window.location.origin}/member/login` : undefined
+        });
+      }
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["payments-member", data.memberId] });
       queryClient.invalidateQueries({ queryKey: ["payment-stats"] });

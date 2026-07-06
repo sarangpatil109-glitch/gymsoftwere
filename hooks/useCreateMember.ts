@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { memberService } from "@/services/memberService";
 import { toast } from "sonner";
 import { Member } from "@/types/member";
+import { dispatchAutomationEvent } from "@/services/automation";
 
 export function useCreateMember() {
   const queryClient = useQueryClient();
@@ -36,8 +37,11 @@ export function useCreateMember() {
       // Always refetch after error or success:
       queryClient.invalidateQueries({ queryKey: ["members"] });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Member added successfully!");
+      if (data && data.id) {
+        dispatchAutomationEvent('MEMBER_CREATED', { memberId: data.id });
+      }
     },
   });
 }

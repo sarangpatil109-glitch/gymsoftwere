@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dietService } from "@/services/dietService";
 import { DietFood, DietPlan, DietPlanMeal } from "@/types/fitness";
 import { toast } from "sonner";
+import { dispatchAutomationEvent } from "@/services/automation";
 
 // DIET FOODS
 export function useDietFoods() {
@@ -67,10 +68,15 @@ export function useCreateDietPlan() {
   return useMutation({
     mutationFn: ({ plan, meals }: { plan: Partial<DietPlan>, meals: Partial<DietPlanMeal>[] }) => 
       dietService.createDietPlan(plan, meals),
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["diet_plans"] });
       if (variables.plan.member_id) {
         queryClient.invalidateQueries({ queryKey: ["diet_plans", variables.plan.member_id] });
+        dispatchAutomationEvent('DIET_ASSIGNED', {
+          memberId: variables.plan.member_id,
+          dietId: data?.id,
+          trainerName: variables.plan.trainer_id // or better, lookup trainer name.
+        });
       }
       toast.success("Diet plan assigned successfully");
     },

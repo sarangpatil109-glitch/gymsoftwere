@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { workoutService } from "@/services/workoutService";
 import { Exercise, WorkoutPlan, WorkoutDay } from "@/types/fitness";
 import { toast } from "sonner";
+import { dispatchAutomationEvent } from "@/services/automation";
 
 // EXERCISES
 export function useExercises() {
@@ -67,10 +68,15 @@ export function useCreateWorkoutPlan() {
   return useMutation({
     mutationFn: ({ plan, days }: { plan: Partial<WorkoutPlan>, days: Partial<WorkoutDay>[] }) => 
       workoutService.createWorkoutPlan(plan, days),
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["workout_plans"] });
       if (variables.plan.member_id) {
         queryClient.invalidateQueries({ queryKey: ["workout_plans", variables.plan.member_id] });
+        dispatchAutomationEvent('WORKOUT_ASSIGNED', {
+          memberId: variables.plan.member_id,
+          workoutId: data?.id,
+          trainerName: variables.plan.trainer_id // or better, lookup trainer name.
+        });
       }
       toast.success("Workout plan assigned successfully");
     },
