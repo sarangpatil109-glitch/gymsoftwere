@@ -16,12 +16,14 @@ export function MobileSidebar() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden text-foreground">
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Open sidebar</span>
-        </Button>
-      </SheetTrigger>
+      <SheetTrigger 
+        render={
+          <Button variant="ghost" size="icon" className="lg:hidden text-foreground">
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Open sidebar</span>
+          </Button>
+        }
+      />
       <SheetContent side="left" className="p-0 w-64 bg-sidebar border-none">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">Access the main navigation for GymOS.</SheetDescription>
