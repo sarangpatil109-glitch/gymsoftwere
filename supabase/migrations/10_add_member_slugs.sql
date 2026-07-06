@@ -55,7 +55,7 @@ BEGIN
   END IF;
 
   -- Always ensure portal_url matches the slug
-  NEW.portal_url := 'http://localhost:3000/member/' || NEW.member_slug;
+  NEW.portal_url := '/member/' || NEW.member_slug;
 
   RETURN NEW;
 END;

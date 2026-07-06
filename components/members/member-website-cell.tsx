@@ -16,22 +16,24 @@ interface MemberWebsiteCellProps {
 export function MemberWebsiteCell({ member }: MemberWebsiteCellProps) {
   const [isQrOpen, setIsQrOpen] = useState(false);
 
-  // Fallback to localhost if window is undefined or for local dev
-  const getBaseUrl = () => {
+  const getFullUrl = () => {
     if (typeof window !== "undefined") {
-      // For local development use localhost:3000, otherwise use fitnesszone.gymos.app
-      if (window.location.hostname === "localhost") {
-        return "http://localhost:3000";
-      }
-      return "https://fitnesszone.gymos.app";
+      return `${window.location.origin}/member/${member.memberSlug || member.memberId}`;
     }
-    return "http://localhost:3000";
+    return `/member/${member.memberSlug || member.memberId}`;
   };
 
-  const portalUrl = member.portalUrl || `${getBaseUrl()}/member/${member.memberSlug || member.memberId}`;
+  const getRelativeUrl = () => {
+    return `/member/${member.memberSlug || member.memberId}`;
+  };
+
+  // If member.portalUrl is an absolute URL (legacy), extract the path or just use getRelativeUrl()
+  // Since we are migrating to relative URLs, we'll prefer getRelativeUrl() for internal navigation
+  const relativeUrl = getRelativeUrl();
+  const fullUrl = getFullUrl();
 
   const copyLink = () => {
-    navigator.clipboard.writeText(portalUrl);
+    navigator.clipboard.writeText(fullUrl);
     toast.success("Portal link copied successfully.");
   };
 
@@ -92,13 +94,13 @@ export function MemberWebsiteCell({ member }: MemberWebsiteCellProps) {
       <div className="flex items-center gap-1.5 font-medium text-sm text-slate-700 dark:text-slate-200">
         <Globe className="h-4 w-4 text-blue-500" /> View Portal
       </div>
-      <span className="text-xs text-muted-foreground truncate max-w-[150px] mb-2" title={portalUrl}>
-        {portalUrl.replace(/^https?:\/\//, '')}
+      <span className="text-xs text-muted-foreground truncate max-w-[150px] mb-2" title={fullUrl}>
+        {fullUrl.replace(/^https?:\/\//, '')}
       </span>
       
       <div className="flex items-center gap-1">
         <Link 
-          href={portalUrl} 
+          href={relativeUrl} 
           target="_blank" 
           className="inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none hover:bg-muted hover:text-foreground h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
         >
@@ -121,7 +123,7 @@ export function MemberWebsiteCell({ member }: MemberWebsiteCellProps) {
             <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
               <QRCodeSVG 
                 id={`qr-svg-${member.id}`}
-                value={portalUrl} 
+                value={fullUrl} 
                 size={200}
                 level="H"
                 includeMargin={true}
