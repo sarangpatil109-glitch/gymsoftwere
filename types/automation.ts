@@ -5,7 +5,11 @@ export type AutomationTriggerType =
   | 'MEMBERSHIP_EXPIRING'
   | 'ATTENDANCE_MISSING'
   | 'WORKOUT_ASSIGNED'
-  | 'DIET_ASSIGNED';
+  | 'DIET_ASSIGNED'
+  | 'NEW_LEAD'
+  | 'TRIAL_TOMORROW'
+  | 'TRIAL_MISSED'
+  | 'LEAD_CONVERTED';
 
 export type AutomationActionType = 'SEND_TEMPLATE';
 

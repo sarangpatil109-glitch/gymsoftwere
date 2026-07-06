@@ -47,10 +47,11 @@ interface MemberModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData?: Member;
+  prefillData?: Partial<Member>;
   onSave: (member: Member) => void;
 }
 
-export function MemberModal({ open, onOpenChange, initialData, onSave }: MemberModalProps) {
+export function MemberModal({ open, onOpenChange, initialData, prefillData, onSave }: MemberModalProps) {
   const isEditing = !!initialData;
   const { data: membershipPlans, isLoading: isPlansLoading } = useActiveMembershipPlans();
 
@@ -104,11 +105,18 @@ export function MemberModal({ open, onOpenChange, initialData, onSave }: MemberM
         membershipType: initialData.membershipType || "",
       });
       setSelectedFile(null);
+    } else if (prefillData && open && !isEditing) {
+      reset({
+        ...form.getValues(), // preserve default values
+        ...prefillData,      // override with prefill data
+        membershipType: "",
+      });
+      setSelectedFile(null);
     } else if (!open) {
       reset();
       setSelectedFile(null);
     }
-  }, [initialData, open, reset]);
+  }, [initialData, prefillData, open, reset, isEditing, form]);
 
   useEffect(() => {
     if (dob) {
@@ -395,8 +403,8 @@ export function MemberModal({ open, onOpenChange, initialData, onSave }: MemberM
 }
 
 // Export wrappers to satisfy the specific component names requested
-export function AddMemberModal({ open, onOpenChange, onSave }: Omit<MemberModalProps, "initialData">) {
-  return <MemberModal open={open} onOpenChange={onOpenChange} onSave={onSave} />;
+export function AddMemberModal({ open, onOpenChange, prefillData, onSave }: Omit<MemberModalProps, "initialData">) {
+  return <MemberModal open={open} onOpenChange={onOpenChange} prefillData={prefillData} onSave={onSave} />;
 }
 
 export function EditMemberModal({ open, onOpenChange, initialData, onSave }: MemberModalProps) {

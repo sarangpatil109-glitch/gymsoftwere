@@ -16,11 +16,13 @@ import {
   ClipboardList,
   MessageCircleCode,
   Store,
-  Zap
+  Zap,
+  Briefcase
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Lead CRM", href: "/crm", icon: Briefcase },
   { name: "Members", href: "/members", icon: Users },
   { name: "Attendance", href: "/attendance", icon: CalendarCheck },
   { name: "Payments", href: "/payments", icon: CreditCard },
