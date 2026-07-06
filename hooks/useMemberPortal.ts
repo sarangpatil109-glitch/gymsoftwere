@@ -8,6 +8,8 @@ import {
 } from "@/utils/demoMemberData";
 
 const isDev = process.env.NODE_ENV === "development";
+const demoSlugs = ['sarang-patil', 'john-doe', 'demo-user', DEMO_MEMBER.member_id, DEMO_MEMBER.member_slug];
+const isDemoMode = (slugOrId: string) => isDev || demoSlugs.includes(slugOrId);
 
 export function usePortalMember(memberId: string) {
   return useQuery({
@@ -19,7 +21,7 @@ export function usePortalMember(memberId: string) {
         .eq('member_id', memberId)
         .single();
       
-      if ((error || !data) && isDev) return DEMO_MEMBER;
+      if ((error || !data) && isDemoMode(memberId)) return DEMO_MEMBER;
       if (error && error.code !== 'PGRST116') throw error;
       return data || null;
     },
@@ -37,7 +39,7 @@ export function usePortalMemberBySlug(slug: string) {
         .or(`member_slug.eq.${slug},member_id.eq.${slug}`)
         .single();
         
-      if ((error || !data) && isDev) {
+      if ((error || !data) && isDemoMode(slug)) {
         return {
           ...DEMO_MEMBER,
           member_slug: slug
@@ -86,7 +88,7 @@ export function usePortalMembership(memberId: string) {
         .eq('status', 'ACTIVE')
         .single();
         
-      if ((error && error.code !== 'PGRST116' || !data) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((error && error.code !== 'PGRST116' || !data) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_MEMBERSHIP;
       }
       
@@ -107,7 +109,7 @@ export function usePortalAttendance(memberId: string) {
         .eq('member_id', memberId)
         .order('check_in', { ascending: false });
       
-      if ((error || !data || data.length === 0) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((error || !data || data.length === 0) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_ATTENDANCE;
       }
       
@@ -132,7 +134,7 @@ export function usePortalWorkout(memberId: string) {
         .limit(1)
         .single();
         
-      if ((wError && wError.code !== 'PGRST116' || !workout) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((wError && wError.code !== 'PGRST116' || !workout) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_WORKOUT;
       }
       
@@ -148,7 +150,7 @@ export function usePortalWorkout(memberId: string) {
         .eq('workout_id', workout.id)
         .order('order_index', { ascending: true });
         
-      if (eError && isDev && memberId === DEMO_MEMBER.member_id) return DEMO_WORKOUT;
+      if (eError && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) return DEMO_WORKOUT;
       if (eError) throw eError;
       
       return { ...workout, exercises: exercises || [] };
@@ -183,7 +185,7 @@ export function usePortalDiet(memberId: string) {
         .limit(1)
         .single();
         
-      if ((dError && dError.code !== 'PGRST116' || !diet) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((dError && dError.code !== 'PGRST116' || !diet) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_DIET;
       }
       
@@ -196,7 +198,7 @@ export function usePortalDiet(memberId: string) {
         .eq('diet_id', diet.id)
         .order('time', { ascending: true });
         
-      if (mError && isDev && memberId === DEMO_MEMBER.member_id) return DEMO_DIET;
+      if (mError && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) return DEMO_DIET;
       if (mError) throw mError;
       
       return { ...diet, meals: meals || [] };
@@ -215,7 +217,7 @@ export function usePortalProgress(memberId: string) {
         .eq('member_id', memberId)
         .order('date', { ascending: true });
         
-      if ((error || !data || data.length === 0) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((error || !data || data.length === 0) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_PROGRESS;
       }
       
@@ -236,7 +238,7 @@ export function usePortalPhotos(memberId: string) {
         .eq('member_id', memberId)
         .order('date', { ascending: false });
         
-      if ((error || !data || data.length === 0) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((error || !data || data.length === 0) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_PHOTOS;
       }
       
@@ -257,7 +259,7 @@ export function usePortalPayments(memberId: string) {
         .eq('member_id', memberId)
         .order('payment_date', { ascending: false });
         
-      if ((error || !data || data.length === 0) && isDev && memberId === DEMO_MEMBER.member_id) {
+      if ((error || !data || data.length === 0) && isDemoMode(memberId) && memberId === DEMO_MEMBER.member_id) {
         return DEMO_PAYMENTS;
       }
       
