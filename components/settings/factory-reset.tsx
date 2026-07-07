@@ -20,19 +20,13 @@ import {
 
 export function FactoryResetSettings() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [resetInput, setResetInput] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [password, setPassword] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   
   const queryClient = useQueryClient();
 
   const resetState = () => {
-    setStep(1);
-    setResetInput("");
     setIsChecked(false);
-    setPassword("");
     setIsProcessing(false);
   };
 
@@ -47,25 +41,11 @@ export function FactoryResetSettings() {
     resetState();
   };
 
-  const nextStep = () => {
-    if (step < 4) setStep((s) => (s + 1) as any);
-  };
+
 
   const executeFactoryReset = async () => {
     setIsProcessing(true);
     try {
-      // 1. Verify Password
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError || !userData?.user?.email) throw new Error("Could not identify current user.");
-
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: userData.user.email,
-        password: password,
-      });
-
-      if (authError) {
-        throw new Error("Invalid admin password.");
-      }
 
       // 2. Execute RPC
       const { error: rpcError } = await supabase.rpc("factory_reset");
@@ -123,89 +103,36 @@ export function FactoryResetSettings() {
             </DialogTitle>
           </DialogHeader>
 
-          {step === 1 && (
-            <>
-              <DialogDescription className="space-y-4">
-                <p>This will permanently delete all business data. This action CANNOT be reversed.</p>
-                <div className="space-y-2 mt-4">
-                  <Label>Type <span className="font-bold text-foreground">RESET</span> to continue.</Label>
-                  <Input 
-                    value={resetInput} 
-                    onChange={(e) => setResetInput(e.target.value)} 
-                    placeholder="RESET"
-                    autoComplete="off"
-                  />
-                </div>
-              </DialogDescription>
-              <DialogFooter>
-                <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                <Button variant="destructive" onClick={nextStep} disabled={resetInput !== "RESET"}>Next Step</Button>
-              </DialogFooter>
-            </>
-          )}
+          <DialogDescription className="space-y-4">
+            <p>This will permanently delete all business data. This action CANNOT be reversed.</p>
+            
+            <div className="p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-md mt-4">
+              <p className="font-bold mb-2">Final Warning!</p>
+              <p className="text-sm">You are about to completely wipe all GymOS business data. Are you absolutely sure?</p>
+            </div>
 
-          {step === 2 && (
-            <>
-              <DialogDescription className="space-y-4 py-4">
-                <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-md border">
-                  <Checkbox 
-                    id="understand" 
-                    checked={isChecked} 
-                    onCheckedChange={(c: boolean) => setIsChecked(c)} 
-                  />
-                  <label
-                    htmlFor="understand"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
-                  >
-                    I understand this action cannot be undone.
-                  </label>
-                </div>
-              </DialogDescription>
-              <DialogFooter>
-                <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                <Button variant="destructive" onClick={nextStep} disabled={!isChecked}>Next Step</Button>
-              </DialogFooter>
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <DialogDescription className="space-y-4">
-                <p>Please enter your Admin Password to verify your identity.</p>
-                <div className="space-y-2 mt-4">
-                  <Label>Admin Password</Label>
-                  <Input 
-                    type="password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    placeholder="••••••••"
-                  />
-                </div>
-              </DialogDescription>
-              <DialogFooter>
-                <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                <Button variant="destructive" onClick={nextStep} disabled={!password}>Next Step</Button>
-              </DialogFooter>
-            </>
-          )}
-
-          {step === 4 && (
-            <>
-              <DialogDescription className="space-y-4 py-2">
-                <div className="p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-md">
-                  <p className="font-bold mb-2">Final Warning!</p>
-                  <p className="text-sm">You are about to completely wipe all GymOS business data. Are you absolutely sure?</p>
-                </div>
-              </DialogDescription>
-              <DialogFooter>
-                <Button variant="outline" onClick={handleClose} disabled={isProcessing}>Cancel</Button>
-                <Button variant="destructive" onClick={executeFactoryReset} disabled={isProcessing}>
-                  {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Delete All Data
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+            <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-md border mt-4">
+              <Checkbox 
+                id="understand" 
+                checked={isChecked} 
+                onCheckedChange={(c: boolean) => setIsChecked(c)} 
+              />
+              <label
+                htmlFor="understand"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
+              >
+                I understand this action cannot be undone.
+              </label>
+            </div>
+          </DialogDescription>
+          
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={handleClose} disabled={isProcessing}>Cancel</Button>
+            <Button variant="destructive" onClick={executeFactoryReset} disabled={!isChecked || isProcessing}>
+              {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete All Data
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
